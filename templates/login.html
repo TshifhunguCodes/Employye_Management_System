@@ -1,0 +1,420 @@
+{% extends "layout.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="auth-form">
+    <h2 style="text-align: center; margin-bottom: 30px; color: #22e710;">Login to EmployeeDB</h2>
+    
+    <form method="POST" action="{{ url_for('login') }}">
+        <div class="form-group">
+            <label for="email"><i class="fas fa-envelope"></i> Email</label>
+            <input type="email" id="email" name="email" required placeholder="Enter your email" class="form-control">
+        </div>
+        
+        <div class="form-group">
+            <label for="password"><i class="fas fa-lock"></i> Password</label>
+            <input type="password" id="password" name="password" required placeholder="Enter your password" class="form-control">
+        </div>
+        
+        <button type="submit" class="btn" style="width: 100%; padding: 14px; font-size: 16px;">
+            <i class="fas fa-sign-in-alt"></i> Login
+        </button>
+    </form>
+    
+    <div style="text-align: center; margin-top: 30px;">
+        <p style="margin-bottom: 20px; color: #666;">
+            Don't have an account? 
+            <a href="{{ url_for('register') }}" style="color: #667eea; font-weight: 500;">
+                Register here
+            </a>
+        </p>
+        
+        <div style="margin-top: 25px; padding: 20px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #667eea;">
+            <p style="color: #444; font-weight: 600; margin-bottom: 10px;">
+                <i class="fas fa-info-circle"></i> Demo Credentials:
+            </p>
+            <div style="background: white; padding: 15px; border-radius: 8px; margin-top: 10px;">
+                <p style="margin: 8px 0; font-size: 14px;">
+                    <strong>Email:</strong> admin@example.com
+                </p>
+                <p style="margin: 8px 0; font-size: 14px;">
+                    <strong>Password:</strong> admin123
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Main container styles */
+    .auth-form {
+        max-width: 450px;
+        margin: 40px auto;
+        padding: 40px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+    
+    /* Heading styles */
+    .auth-form h2 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #2c3e50;
+        font-size: 28px;
+        font-weight: 600;
+        letter-spacing: -0.5px;
+    }
+    
+    /* Form group container */
+    .form-group {
+        margin-bottom: 25px;
+        position: relative;
+    }
+    
+    /* Label styles */
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #4a5568;
+        font-size: 14px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .form-group label i {
+        margin-right: 8px;
+        color: #667eea;
+        width: 16px;
+        text-align: center;
+    }
+    
+    /* Input field styles */
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        background-color: #f8f9fa;
+        color: #2d3748;
+        box-sizing: border-box;
+    }
+    
+    .form-control::placeholder {
+        color: #a0aec0;
+        font-size: 14px;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        outline: none;
+        background-color: white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .form-control:hover {
+        border-color: #cbd5e0;
+    }
+    
+    /* Button styles */
+    .btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 14px 28px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: 0.5s;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn:hover::before {
+        left: 100%;
+    }
+    
+    .btn:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn i {
+        margin-right: 8px;
+        font-size: 14px;
+    }
+    
+    /* Register link styles */
+    .auth-form p {
+        margin-bottom: 20px;
+        color: #718096;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+    
+    .auth-form a {
+        color: #667eea;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    .auth-form a::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 1px;
+        bottom: -2px;
+        left: 0;
+        background-color: #667eea;
+        transition: width 0.3s ease;
+    }
+    
+    .auth-form a:hover {
+        color: #5a67d8;
+    }
+    
+    .auth-form a:hover::after {
+        width: 100%;
+    }
+    
+    /* Demo credentials container */
+    .auth-form > div:last-child {
+        margin-top: 30px;
+    }
+    
+    /* Info box styles */
+    .auth-form > div:last-child > div {
+        margin-top: 25px;
+        padding: 20px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 10px;
+        border-left: 4px solid #667eea;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    
+    /* Info heading */
+    .auth-form > div:last-child > div > p:first-child {
+        color: #4a5568;
+        font-weight: 600;
+        margin-bottom: 10px;
+        font-size: 16px;
+    }
+    
+    .auth-form > div:last-child > div > p:first-child i {
+        color: #667eea;
+        margin-right: 10px;
+    }
+    
+    /* Credentials box */
+    .auth-form > div:last-child > div > div {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 10px;
+        border: 1px solid #e2e8f0;
+    }
+    
+    /* Credential text */
+    .auth-form > div:last-child > div > div p {
+        margin: 8px 0;
+        font-size: 14px;
+        color: #4a5568;
+        font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    
+    .auth-form > div:last-child > div > div strong {
+        color: #2d3748;
+        font-weight: 600;
+        display: inline-block;
+        width: 80px;
+    }
+    
+    /* Responsive styles */
+    @media (max-width: 768px) {
+        .auth-form {
+            margin: 20px;
+            padding: 30px 20px;
+            border-radius: 10px;
+        }
+        
+        .auth-form h2 {
+            font-size: 24px;
+            margin-bottom: 25px;
+        }
+        
+        .form-control {
+            padding: 10px 12px;
+            font-size: 15px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            font-size: 15px;
+        }
+        
+        .auth-form > div:last-child > div {
+            padding: 15px;
+        }
+        
+        .auth-form > div:last-child > div > div {
+            padding: 12px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .auth-form {
+            margin: 15px;
+            padding: 25px 15px;
+        }
+        
+        .auth-form h2 {
+            font-size: 22px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            font-size: 13px;
+        }
+        
+        .btn i {
+            margin-right: 6px;
+        }
+    }
+    
+    /* Animation for form appearance */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .auth-form {
+        animation: fadeIn 0.6s ease-out;
+    }
+    
+    /* Password toggle button */
+    .password-toggle {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #667eea;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 5px;
+        transition: color 0.3s ease;
+    }
+    
+    .password-toggle:hover {
+        color: #5a67d8;
+    }
+    
+    /* Focus styles for accessibility */
+    .form-control:focus-visible {
+        outline: 2px solid #667eea;
+        outline-offset: 2px;
+    }
+    
+    .btn:focus-visible {
+        outline: 2px solid #667eea;
+        outline-offset: 2px;
+    }
+</style>
+
+<script>
+    // Add password visibility toggle
+    document.addEventListener('DOMContentLoaded', function() {
+        const passwordInput = document.getElementById('password');
+        const toggleButton = document.createElement('button');
+        toggleButton.type = 'button';
+        toggleButton.className = 'password-toggle';
+        toggleButton.innerHTML = '<i class="fas fa-eye"></i>';
+        toggleButton.setAttribute('aria-label', 'Toggle password visibility');
+        
+        const passwordContainer = document.createElement('div');
+        passwordContainer.style.position = 'relative';
+        passwordInput.parentNode.insertBefore(passwordContainer, passwordInput);
+        passwordContainer.appendChild(passwordInput);
+        passwordContainer.appendChild(toggleButton);
+        
+        toggleButton.addEventListener('click', function() {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+            this.setAttribute('aria-label', type === 'password' ? 'Show password' : 'Hide password');
+        });
+        
+        // Auto-focus email field
+        document.getElementById('email').focus();
+        
+        // Add form validation styles
+        const form = document.querySelector('form');
+        const emailInput = document.getElementById('email');
+        const passwordInputField = document.getElementById('password');
+        
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+        
+        emailInput.addEventListener('blur', function() {
+            if (this.value && !validateEmail(this.value)) {
+                this.style.borderColor = '#e53e3e';
+                this.style.boxShadow = '0 0 0 3px rgba(229, 62, 62, 0.1)';
+            } else {
+                this.style.borderColor = this.value ? '#48bb78' : '#e0e0e0';
+                this.style.boxShadow = this.value ? '0 0 0 3px rgba(72, 187, 120, 0.1)' : 'none';
+            }
+        });
+        
+        passwordInputField.addEventListener('blur', function() {
+            if (this.value && this.value.length < 6) {
+                this.style.borderColor = '#e53e3e';
+                this.style.boxShadow = '0 0 0 3px rgba(229, 62, 62, 0.1)';
+            } else if (this.value) {
+                this.style.borderColor = '#48bb78';
+                this.style.boxShadow = '0 0 0 3px rgba(72, 187, 120, 0.1)';
+            } else {
+                this.style.borderColor = '#e0e0e0';
+                this.style.boxShadow = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

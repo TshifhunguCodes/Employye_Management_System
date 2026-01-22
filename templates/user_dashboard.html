@@ -1,0 +1,815 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div class="header-content">
+        <h1><i class="fas fa-user-circle"></i> Welcome, {{ session.name }}!</h1>
+        <p class="subtitle">Your personal dashboard and information hub</p>
+    </div>
+    <div class="user-avatar">
+        <div class="avatar-circle" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            {{ session.name[0]|upper }}
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-content">
+    <div class="dashboard-grid">
+        <!-- Left Column: Personal Information -->
+        <div class="dashboard-card info-card">
+            <div class="card-header">
+                <h2><i class="fas fa-id-card"></i> Personal Information</h2>
+                <button class="card-action" title="Edit Profile">
+                    <i class="fas fa-edit"></i>
+                </button>
+            </div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="fas fa-hashtag"></i> Employee ID
+                    </div>
+                    <div class="info-value">{{ user.employee_id }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="fas fa-user"></i> Full Name
+                    </div>
+                    <div class="info-value">{{ user.firstname }} {{ user.lastname }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="fas fa-envelope"></i> Email
+                    </div>
+                    <div class="info-value">{{ user.email }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="fas fa-venus-mars"></i> Gender
+                    </div>
+                    <div class="info-value">
+                        <span class="gender-badge {{ user.gender|lower }}">
+                            {{ user.gender }}
+                        </span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="fas fa-birthday-cake"></i> Birth Date
+                    </div>
+                    <div class="info-value">
+                        {% if user.birthdate %}
+                            {{ user.birthdate.strftime('%B %d, %Y') }}
+                            <small class="age-text">
+                                ({{ (now.year - user.birthdate.year) }} years old)
+                            </small>
+                        {% else %}
+                            <span class="text-muted">Not specified</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="fas fa-calendar-check"></i> Hire Date
+                    </div>
+                    <div class="info-value">
+                        {% if user.hire %}
+                            {{ user.hire.strftime('%B %d, %Y') }}
+                            <small class="tenure-text">
+                                ({{ (now.year - user.hire.year) }} years of service)
+                            </small>
+                        {% else %}
+                            <span class="text-muted">Not specified</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="fas fa-money-bill-wave"></i> Salary
+                    </div>
+                    <div class="info-value salary-value">
+                        ${{ "%.2f"|format(user.salary) if user.salary else '0.00' }}
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">
+                        <i class="fas fa-calendar-day"></i> Last Login
+                    </div>
+                    <div class="info-value">
+                        {{ now.strftime('%B %d, %Y %I:%M %p') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Statistics Cards -->
+        <div class="stats-section">
+            <div class="dashboard-card stats-card total-employees">
+                <div class="stats-header">
+                    <i class="fas fa-users stats-icon"></i>
+                    <h3>Total Employees</h3>
+                </div>
+                <div class="stats-number">{{ total_employees }}</div>
+                <p class="stats-description">
+                    Total number of employees in the system
+                </p>
+                <div class="stats-trend">
+                    <i class="fas fa-chart-line"></i>
+                    <span>All departments</span>
+                </div>
+            </div>
+
+            <div class="dashboard-card stats-card avg-salary">
+                <div class="stats-header">
+                    <i class="fas fa-chart-bar stats-icon"></i>
+                    <h3>Average Salary</h3>
+                </div>
+                <div class="stats-number">${{ "%.2f"|format(avg_salary) }}</div>
+                <p class="stats-description">
+                    Average salary across all employees
+                </p>
+                <div class="stats-trend">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>Company average</span>
+                </div>
+            </div>
+
+            <div class="dashboard-card stats-card service-years">
+                <div class="stats-header">
+                    <i class="fas fa-award stats-icon"></i>
+                    <h3>Your Tenure</h3>
+                </div>
+                {% if user.hire %}
+                    {% set years = (now.year - user.hire.year) %}
+                    <div class="stats-number">{{ years }}<span class="stats-unit">year{% if years != 1 %}s{% endif %}</span></div>
+                    <p class="stats-description">
+                        Years of service at the company
+                    </p>
+                    <div class="stats-trend">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Joined {{ user.hire.strftime('%b %Y') }}</span>
+                    </div>
+                {% else %}
+                    <div class="stats-number">N/A</div>
+                    <p class="stats-description">
+                        Hire date not available
+                    </p>
+                {% endif %}
+            </div>
+
+            <div class="dashboard-card stats-card personal-age">
+                <div class="stats-header">
+                    <i class="fas fa-birthday-cake stats-icon"></i>
+                    <h3>Your Age</h3>
+                </div>
+                {% if user.birthdate %}
+                    {% set age = (now.year - user.birthdate.year) %}
+                    <div class="stats-number">{{ age }}<span class="stats-unit">years</span></div>
+                    <p class="stats-description">
+                        Based on your birth date
+                    </p>
+                    <div class="stats-trend">
+                        <i class="fas fa-cake-candles"></i>
+                        <span>Born {{ user.birthdate.strftime('%b %Y') }}</span>
+                    </div>
+                {% else %}
+                    <div class="stats-number">N/A</div>
+                    <p class="stats-description">
+                        Birth date not available
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+        <div class="actions-grid">
+            <a href="#" class="action-card">
+                <div class="action-icon update-profile">
+                    <i class="fas fa-user-edit"></i>
+                </div>
+                <h3>Update Profile</h3>
+                <p>Edit your personal information</p>
+            </a>
+            <a href="#" class="action-card">
+                <div class="action-icon change-password">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3>Change Password</h3>
+                <p>Update your account password</p>
+            </a>
+            <a href="#" class="action-card">
+                <div class="action-icon view-colleagues">
+                    <i class="fas fa-address-book"></i>
+                </div>
+                <h3>View Colleagues</h3>
+                <p>Browse other employees</p>
+            </a>
+            <a href="#" class="action-card">
+                <div class="action-icon download-data">
+                    <i class="fas fa-download"></i>
+                </div>
+                <h3>Export Data</h3>
+                <p>Download your information</p>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Dashboard Base Styles */
+    .dashboard-content {
+        padding: 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* Dashboard Header */
+    .dashboard-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: rgba(255,255,255,0.2);
+    }
+
+    .header-content h1 {
+        font-size: 2.2rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .header-content h1 i {
+        font-size: 1.8rem;
+        color: rgba(255,255,255,0.9);
+    }
+
+    .subtitle {
+        font-size: 1.1rem;
+        color: rgba(255,255,255,0.8);
+        margin: 0;
+    }
+
+    .user-avatar .avatar-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 600;
+        color: white;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        border: 3px solid rgba(255,255,255,0.3);
+        transition: all 0.3s ease;
+    }
+
+    .user-avatar .avatar-circle:hover {
+        transform: scale(1.05);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+    }
+
+    /* Dashboard Grid Layout */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 30px;
+        margin-top: 30px;
+    }
+
+    /* Cards */
+    .dashboard-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border: 1px solid #f1f1f1;
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+    }
+
+    .info-card {
+        grid-row: span 1;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .card-header h2 {
+        font-size: 1.4rem;
+        color: #2c3e50;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .card-header h2 i {
+        color: #667eea;
+    }
+
+    .card-action {
+        background: #f8f9fa;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        padding: 8px 12px;
+        color: #667eea;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .card-action:hover {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+    }
+
+    /* Information Grid */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .info-item {
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        border-left: 4px solid #667eea;
+        transition: all 0.3s ease;
+    }
+
+    .info-item:hover {
+        background: #edf2f7;
+        transform: translateX(5px);
+    }
+
+    .info-label {
+        font-size: 0.85rem;
+        color: #718096;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .info-label i {
+        color: #667eea;
+        width: 16px;
+        text-align: center;
+    }
+
+    .info-value {
+        font-size: 1.1rem;
+        color: #2d3748;
+        font-weight: 500;
+        word-break: break-word;
+    }
+
+    .gender-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-transform: capitalize;
+    }
+
+    .gender-badge.male {
+        background: rgba(66, 153, 225, 0.1);
+        color: #4299e1;
+        border: 1px solid rgba(66, 153, 225, 0.3);
+    }
+
+    .gender-badge.female {
+        background: rgba(237, 100, 166, 0.1);
+        color: #ed64a6;
+        border: 1px solid rgba(237, 100, 166, 0.3);
+    }
+
+    .gender-badge.other {
+        background: rgba(123, 97, 255, 0.1);
+        color: #7b61ff;
+        border: 1px solid rgba(123, 97, 255, 0.3);
+    }
+
+    .age-text, .tenure-text {
+        font-size: 0.85rem;
+        color: #718096;
+        font-style: italic;
+        display: block;
+        margin-top: 4px;
+    }
+
+    .salary-value {
+        color: #38a169;
+        font-weight: 600;
+        font-size: 1.2rem;
+    }
+
+    /* Stats Cards */
+    .stats-section {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .stats-card {
+        display: flex;
+        flex-direction: column;
+        min-height: 180px;
+    }
+
+    .stats-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 15px;
+    }
+
+    .stats-icon {
+        font-size: 1.5rem;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        color: white;
+    }
+
+    .total-employees .stats-icon {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .avg-salary .stats-icon {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    }
+
+    .service-years .stats-icon {
+        background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+    }
+
+    .personal-age .stats-icon {
+        background: linear-gradient(135deg, #ed64a6 0%, #805ad5 100%);
+    }
+
+    .stats-card h3 {
+        font-size: 1rem;
+        color: #4a5568;
+        font-weight: 500;
+        margin: 0;
+    }
+
+    .stats-number {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin: 10px 0;
+        line-height: 1;
+    }
+
+    .stats-unit {
+        font-size: 1rem;
+        color: #718096;
+        margin-left: 5px;
+        font-weight: 500;
+    }
+
+    .stats-description {
+        color: #718096;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        flex-grow: 1;
+        margin: 10px 0;
+    }
+
+    .stats-trend {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        color: #718096;
+        margin-top: auto;
+        padding-top: 10px;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .stats-trend i {
+        color: #667eea;
+    }
+
+    /* Quick Actions */
+    .quick-actions {
+        margin-top: 40px;
+    }
+
+    .quick-actions h2 {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .quick-actions h2 i {
+        color: #667eea;
+    }
+
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .action-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s ease;
+        border: 1px solid #f1f1f1;
+        display: block;
+    }
+
+    .action-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        border-color: #667eea;
+    }
+
+    .action-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        margin-bottom: 20px;
+    }
+
+    .update-profile .action-icon {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .change-password .action-icon {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    }
+
+    .view-colleagues .action-icon {
+        background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+    }
+
+    .download-data .action-icon {
+        background: linear-gradient(135deg, #ed64a6 0%, #805ad5 100%);
+    }
+
+    .action-card h3 {
+        font-size: 1.1rem;
+        color: #2d3748;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    .action-card p {
+        color: #718096;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .header-content h1 {
+            font-size: 1.8rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-header {
+            flex-direction: column;
+            text-align: center;
+            gap: 20px;
+            padding: 30px 20px;
+        }
+        
+        .header-content h1 {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .actions-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .stats-number {
+            font-size: 1.8rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .dashboard-content {
+            padding: 15px;
+        }
+        
+        .dashboard-card {
+            padding: 20px;
+        }
+        
+        .card-header {
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+        }
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .dashboard-grid > * {
+        animation: fadeIn 0.6s ease-out;
+    }
+
+    .dashboard-grid > *:nth-child(1) { animation-delay: 0.1s; }
+    .dashboard-grid > *:nth-child(2) { animation-delay: 0.2s; }
+    .quick-actions { animation-delay: 0.3s; }
+
+    /* Loading skeleton */
+    .loading-skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+    }
+
+    @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate numbers counting up
+        function animateValue(element, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                element.innerHTML = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Animate salary with currency
+        function animateCurrency(element, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const value = progress * (end - start) + start;
+                element.innerHTML = '$' + value.toFixed(2);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Animate stats numbers
+        const statsNumbers = document.querySelectorAll('.stats-number');
+        statsNumbers.forEach(element => {
+            const text = element.textContent.trim();
+            if (text.includes('$')) {
+                const value = parseFloat(text.replace('$', '').replace(',', ''));
+                if (!isNaN(value)) {
+                    element.textContent = '$0.00';
+                    setTimeout(() => {
+                        animateCurrency(element, 0, value, 1500);
+                    }, 500);
+                }
+            } else if (!isNaN(parseInt(text))) {
+                const value = parseInt(text);
+                element.textContent = '0';
+                setTimeout(() => {
+                    animateValue(element, 0, value, 1000);
+                }, 500);
+            }
+        });
+
+        // Add hover effects to info items
+        const infoItems = document.querySelectorAll('.info-item');
+        infoItems.forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(5px)';
+                this.style.boxShadow = '0 8px 20px rgba(102, 126, 234, 0.15)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+                this.style.boxShadow = 'none';
+            });
+        });
+
+        // Add click animation to action cards
+        const actionCards = document.querySelectorAll('.action-card');
+        actionCards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                if (this.getAttribute('href') === '#') {
+                    e.preventDefault();
+                    this.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                }
+            });
+        });
+
+        // Real-time clock update
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            });
+            const dateString = now.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            const clockElement = document.querySelector('.last-login-time');
+            if (clockElement) {
+                clockElement.textContent = `${dateString} ${timeString}`;
+            }
+        }
+
+        // Update clock every minute
+        setInterval(updateClock, 60000);
+        updateClock();
+    });
+</script>
+{% endblock %}

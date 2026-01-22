@@ -1,0 +1,1070 @@
+{% extends "layout.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-header admin-header">
+    <div class="header-content">
+        <h1><i class="fas fa-cog"></i> Admin Dashboard</h1>
+        <p class="subtitle">Manage EmployeeDB System and Analytics</p>
+    </div>
+    <div class="admin-actions">
+        <button class="admin-action-btn" title="System Settings">
+            <i class="fas fa-sliders-h"></i>
+        </button>
+        <button class="admin-action-btn" title="Notifications">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+        </button>
+        <button class="admin-action-btn" title="Quick Help">
+            <i class="fas fa-question-circle"></i>
+        </button>
+    </div>
+</div>
+
+<div class="admin-content">
+    <!-- Navigation Tabs -->
+    <div class="admin-nav-tabs">
+        <div class="tabs-container">
+            <a href="{{ url_for('admin_tables', table_name='dimemployee') }}" class="tab-item active">
+                <i class="fas fa-users"></i>
+                <span>Employees</span>
+                <span class="tab-badge">{{ total_employees }}</span>
+            </a>
+            <a href="{{ url_for('admin_tables', table_name='dimdepartment') }}" class="tab-item">
+                <i class="fas fa-building"></i>
+                <span>Departments</span>
+                <span class="tab-badge">{{ total_departments }}</span>
+            </a>
+            <a href="{{ url_for('admin_tables', table_name='dimjob') }}" class="tab-item">
+                <i class="fas fa-briefcase"></i>
+                <span>Jobs</span>
+                <span class="tab-badge">{{ total_jobs }}</span>
+            </a>
+            <a href="{{ url_for('admin_tables', table_name='dimlocation') }}" class="tab-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Locations</span>
+                <span class="tab-badge">{{ total_locations }}</span>
+            </a>
+            <a href="#" class="tab-item">
+                <i class="fas fa-chart-pie"></i>
+                <span>Analytics</span>
+            </a>
+            <a href="#" class="tab-item">
+                <i class="fas fa-cogs"></i>
+                <span>Settings</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="admin-stats-grid">
+        <div class="admin-stat-card">
+            <div class="stat-card-header">
+                <div class="stat-icon employees-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-header-info">
+                    <h3>Total Employees</h3>
+                    <span class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i> 12% this month
+                    </span>
+                </div>
+            </div>
+            <div class="stat-card-body">
+                <div class="stat-number">{{ total_employees }}</div>
+                <div class="stat-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 85%;"></div>
+                    </div>
+                    <span class="progress-text">85% growth target</span>
+                </div>
+            </div>
+            <div class="stat-card-footer">
+                <span class="stat-description">Active employees in system</span>
+                <a href="{{ url_for('admin_tables', table_name='dimemployee') }}" class="stat-action">
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="admin-stat-card">
+            <div class="stat-card-header">
+                <div class="stat-icon departments-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="stat-header-info">
+                    <h3>Departments</h3>
+                    <span class="stat-change neutral">
+                        <i class="fas fa-minus"></i> No change
+                    </span>
+                </div>
+            </div>
+            <div class="stat-card-body">
+                <div class="stat-number">{{ total_departments }}</div>
+                <div class="stat-chart">
+                    <canvas id="departmentsChart" width="100" height="40"></canvas>
+                </div>
+            </div>
+            <div class="stat-card-footer">
+                <span class="stat-description">Company departments</span>
+                <a href="{{ url_for('admin_tables', table_name='dimdepartment') }}" class="stat-action">
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="admin-stat-card">
+            <div class="stat-card-header">
+                <div class="stat-icon jobs-icon">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <div class="stat-header-info">
+                    <h3>Job Titles</h3>
+                    <span class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i> 5% this month
+                    </span>
+                </div>
+            </div>
+            <div class="stat-card-body">
+                <div class="stat-number">{{ total_jobs }}</div>
+                <div class="stat-list">
+                    <div class="stat-list-item">
+                        <span class="list-label">Managerial</span>
+                        <span class="list-value">12</span>
+                    </div>
+                    <div class="stat-list-item">
+                        <span class="list-label">Technical</span>
+                        <span class="list-value">45</span>
+                    </div>
+                    <div class="stat-list-item">
+                        <span class="list-label">Support</span>
+                        <span class="list-value">18</span>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card-footer">
+                <span class="stat-description">Different job positions</span>
+                <a href="{{ url_for('admin_tables', table_name='dimjob') }}" class="stat-action">
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="admin-stat-card">
+            <div class="stat-card-header">
+                <div class="stat-icon locations-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="stat-header-info">
+                    <h3>Locations</h3>
+                    <span class="stat-change positive">
+                        <i class="fas fa-plus"></i> 2 new
+                    </span>
+                </div>
+            </div>
+            <div class="stat-card-body">
+                <div class="stat-number">{{ total_locations }}</div>
+                <div class="stat-distribution">
+                    <div class="distribution-item">
+                        <div class="distribution-color" style="background: #667eea;"></div>
+                        <span>US: 12</span>
+                    </div>
+                    <div class="distribution-item">
+                        <div class="distribution-color" style="background: #48bb78;"></div>
+                        <span>EU: 8</span>
+                    </div>
+                    <div class="distribution-item">
+                        <div class="distribution-color" style="background: #ed8936;"></div>
+                        <span>Asia: 6</span>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card-footer">
+                <span class="stat-description">Office locations worldwide</span>
+                <a href="{{ url_for('admin_tables', table_name='dimlocation') }}" class="stat-action">
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="admin-actions-section">
+        <div class="section-header">
+            <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+            <div class="section-actions">
+                <button class="btn-refresh" title="Refresh">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button class="btn-expand" title="Expand">
+                    <i class="fas fa-expand"></i>
+                </button>
+            </div>
+        </div>
+        <div class="actions-grid">
+            <a href="{{ url_for('admin_add', table_name='dimemployee') }}" class="action-card add-employee">
+                <div class="action-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="action-content">
+                    <h3>Add Employee</h3>
+                    <p>Create new employee record</p>
+                </div>
+                <div class="action-badge">New</div>
+            </a>
+            <a href="{{ url_for('admin_add', table_name='dimdepartment') }}" class="action-card add-department">
+                <div class="action-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div class="action-content">
+                    <h3>Add Department</h3>
+                    <p>Create new department</p>
+                </div>
+            </a>
+            <a href="{{ url_for('admin_add', table_name='dimjob') }}" class="action-card add-job">
+                <div class="action-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div class="action-content">
+                    <h3>Add Job</h3>
+                    <p>Create new job position</p>
+                </div>
+            </a>
+            <a href="{{ url_for('admin_add', table_name='dimlocation') }}" class="action-card add-location">
+                <div class="action-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div class="action-content">
+                    <h3>Add Location</h3>
+                    <p>Add new office location</p>
+                </div>
+            </a>
+            <a href="#" class="action-card view-reports">
+                <div class="action-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="action-content">
+                    <h3>View Reports</h3>
+                    <p>System analytics & insights</p>
+                </div>
+            </a>
+            <a href="#" class="action-card user-management">
+                <div class="action-icon">
+                    <i class="fas fa-user-cog"></i>
+                </div>
+                <div class="action-content">
+                    <h3>User Management</h3>
+                    <p>Manage user accounts & permissions</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="recent-activity">
+        <div class="section-header">
+            <h2><i class="fas fa-history"></i> Recent Activity</h2>
+            <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="activity-list">
+            <div class="activity-item">
+                <div class="activity-icon success">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="activity-content">
+                    <h4>New Employee Added</h4>
+                    <p>John Doe joined as Software Engineer</p>
+                    <span class="activity-time">10 minutes ago</span>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon info">
+                    <i class="fas fa-edit"></i>
+                </div>
+                <div class="activity-content">
+                    <h4>Profile Updated</h4>
+                    <p>Sarah Smith updated her contact information</p>
+                    <span class="activity-time">45 minutes ago</span>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="activity-content">
+                    <h4>System Alert</h4>
+                    <p>Backup completed successfully</p>
+                    <span class="activity-time">2 hours ago</span>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon error">
+                    <i class="fas fa-user-slash"></i>
+                </div>
+                <div class="activity-content">
+                    <h4>Account Deactivated</h4>
+                    <p>Robert Brown's account was deactivated</p>
+                    <span class="activity-time">5 hours ago</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Admin Dashboard Specific Styles */
+    .admin-header {
+        background: linear-gradient(135deg, #2c3e50 0%, #4a5568 100%);
+        padding: 30px 40px;
+    }
+
+    .admin-header .header-content h1 {
+        color: white;
+        font-size: 2rem;
+        margin-bottom: 8px;
+    }
+
+    .admin-header .header-content .subtitle {
+        color: rgba(255,255,255,0.8);
+        font-size: 1rem;
+    }
+
+    .admin-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .admin-action-btn {
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: white;
+        width: 45px;
+        height: 45px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .admin-action-btn:hover {
+        background: rgba(255,255,255,0.2);
+        transform: translateY(-2px);
+    }
+
+    .notification-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: #e53e3e;
+        color: white;
+        font-size: 0.7rem;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+    }
+
+    .admin-content {
+        padding: 30px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* Navigation Tabs */
+    .admin-nav-tabs {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .tabs-container {
+        display: flex;
+        gap: 2px;
+        background: #f8f9fa;
+        padding: 4px;
+        border-radius: 12px;
+    }
+
+    .tab-item {
+        flex: 1;
+        padding: 18px 20px;
+        text-decoration: none;
+        color: #718096;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        position: relative;
+    }
+
+    .tab-item:hover {
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+    }
+
+    .tab-item.active {
+        background: white;
+        color: #667eea;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .tab-badge {
+        background: #667eea;
+        color: white;
+        font-size: 0.75rem;
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+
+    /* Admin Stats Grid */
+    .admin-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+
+    .admin-stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border: 1px solid #f1f1f1;
+    }
+
+    .admin-stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+    }
+
+    .stat-card-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .stat-icon {
+        width: 55px;
+        height: 55px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .employees-icon { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .departments-icon { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); }
+    .jobs-icon { background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); }
+    .locations-icon { background: linear-gradient(135deg, #ed64a6 0%, #805ad5 100%); }
+
+    .stat-header-info h3 {
+        font-size: 1.1rem;
+        color: #2d3748;
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+
+    .stat-change {
+        font-size: 0.8rem;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+
+    .stat-change.positive {
+        background: rgba(72, 187, 120, 0.1);
+        color: #38a169;
+    }
+
+    .stat-change.neutral {
+        background: rgba(113, 128, 150, 0.1);
+        color: #718096;
+    }
+
+    .stat-change.negative {
+        background: rgba(229, 62, 62, 0.1);
+        color: #e53e3e;
+    }
+
+    .stat-card-body {
+        margin-bottom: 25px;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2d3748;
+        line-height: 1;
+        margin-bottom: 15px;
+    }
+
+    .progress-bar {
+        height: 6px;
+        background: #e2e8f0;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 8px;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        border-radius: 3px;
+        transition: width 1s ease;
+    }
+
+    .progress-text {
+        font-size: 0.85rem;
+        color: #718096;
+    }
+
+    .stat-chart {
+        height: 40px;
+        margin-top: 10px;
+    }
+
+    .stat-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 15px;
+    }
+
+    .stat-list-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .stat-list-item:last-child {
+        border-bottom: none;
+    }
+
+    .list-label {
+        color: #718096;
+        font-size: 0.9rem;
+    }
+
+    .list-value {
+        color: #2d3748;
+        font-weight: 600;
+    }
+
+    .stat-distribution {
+        display: flex;
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    .distribution-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        color: #4a5568;
+    }
+
+    .distribution-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+    }
+
+    .stat-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 20px;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .stat-description {
+        color: #718096;
+        font-size: 0.9rem;
+    }
+
+    .stat-action {
+        color: #667eea;
+        text-decoration: none;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+    }
+
+    .stat-action:hover {
+        background: #667eea;
+        color: white;
+        transform: translateX(3px);
+    }
+
+    /* Admin Actions Section */
+    .admin-actions-section {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 40px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .section-header h2 {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .section-header h2 i {
+        color: #667eea;
+    }
+
+    .section-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-refresh, .btn-expand {
+        background: #f8f9fa;
+        border: 1px solid #e0e0e0;
+        color: #667eea;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-refresh:hover, .btn-expand:hover {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+    }
+
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .action-card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 25px;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        position: relative;
+    }
+
+    .action-card:hover {
+        background: white;
+        border-color: #667eea;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .add-employee:hover { border-color: #667eea; }
+    .add-department:hover { border-color: #48bb78; }
+    .add-job:hover { border-color: #ed8936; }
+    .add-location:hover { border-color: #ed64a6; }
+    .view-reports:hover { border-color: #805ad5; }
+    .user-management:hover { border-color: #2c3e50; }
+
+    .action-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        color: white;
+    }
+
+    .add-employee .action-icon { background: #667eea; }
+    .add-department .action-icon { background: #48bb78; }
+    .add-job .action-icon { background: #ed8936; }
+    .add-location .action-icon { background: #ed64a6; }
+    .view-reports .action-icon { background: #805ad5; }
+    .user-management .action-icon { background: #2c3e50; }
+
+    .action-content {
+        flex: 1;
+    }
+
+    .action-content h3 {
+        font-size: 1.1rem;
+        color: #2d3748;
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+
+    .action-content p {
+        color: #718096;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    .action-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: #e53e3e;
+        color: white;
+        font-size: 0.7rem;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+
+    /* Recent Activity */
+    .recent-activity {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .view-all {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .view-all:hover {
+        color: #5a67d8;
+        gap: 10px;
+    }
+
+    .activity-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .activity-item {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .activity-item:hover {
+        background: #edf2f7;
+        transform: translateX(5px);
+    }
+
+    .activity-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        color: white;
+    }
+
+    .activity-icon.success { background: #48bb78; }
+    .activity-icon.info { background: #4299e1; }
+    .activity-icon.warning { background: #ed8936; }
+    .activity-icon.error { background: #e53e3e; }
+
+    .activity-content {
+        flex: 1;
+    }
+
+    .activity-content h4 {
+        font-size: 1rem;
+        color: #2d3748;
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+
+    .activity-content p {
+        color: #718096;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+    }
+
+    .activity-time {
+        font-size: 0.8rem;
+        color: #a0aec0;
+        font-style: italic;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+        .admin-stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .actions-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .admin-header {
+            flex-direction: column;
+            text-align: center;
+            gap: 20px;
+            padding: 25px 20px;
+        }
+        
+        .admin-actions {
+            justify-content: center;
+        }
+        
+        .admin-content {
+            padding: 20px;
+        }
+        
+        .tabs-container {
+            flex-wrap: wrap;
+        }
+        
+        .tab-item {
+            flex: 1 0 calc(50% - 4px);
+            padding: 15px;
+        }
+        
+        .admin-stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .actions-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .section-header {
+            flex-direction: column;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        
+        .section-actions {
+            align-self: flex-end;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .tab-item {
+            flex: 1 0 100%;
+        }
+        
+        .stat-card-header {
+            flex-direction: column;
+            text-align: center;
+            gap: 15px;
+        }
+        
+        .stat-change {
+            align-self: center;
+        }
+        
+        .activity-item {
+            flex-direction: column;
+            text-align: center;
+            gap: 15px;
+        }
+    }
+
+    /* Animations */
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .admin-stat-card {
+        animation: slideInRight 0.6s ease-out;
+    }
+
+    .admin-stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .admin-stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .admin-stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .admin-stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    .action-badge {
+        animation: pulse 2s infinite;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate progress bars
+        const progressBars = document.querySelectorAll('.progress-fill');
+        progressBars.forEach(bar => {
+            const width = bar.style.width;
+            bar.style.width = '0';
+            setTimeout(() => {
+                bar.style.width = width;
+            }, 300);
+        });
+
+        // Toggle active state for tabs
+        const tabs = document.querySelectorAll('.tab-item');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                if (this.getAttribute('href') === '#') {
+                    e.preventDefault();
+                }
+                tabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Animate stats numbers
+        const statNumbers = document.querySelectorAll('.stat-number');
+        statNumbers.forEach(element => {
+            const text = element.textContent.trim();
+            const value = parseInt(text.replace(',', ''));
+            if (!isNaN(value)) {
+                element.textContent = '0';
+                let counter = 0;
+                const increment = value / 50;
+                const timer = setInterval(() => {
+                    counter += increment;
+                    if (counter >= value) {
+                        counter = value;
+                        clearInterval(timer);
+                    }
+                    element.textContent = Math.floor(counter).toLocaleString();
+                }, 30);
+            }
+        });
+
+        // Refresh button functionality
+        const refreshBtn = document.querySelector('.btn-refresh');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', function() {
+                this.classList.add('rotating');
+                setTimeout(() => {
+                    location.reload();
+                }, 500);
+            });
+        }
+
+        // Expand button functionality
+        const expandBtn = document.querySelector('.btn-expand');
+        if (expandBtn) {
+            expandBtn.addEventListener('click', function() {
+                document.body.classList.toggle('fullscreen');
+                const icon = this.querySelector('i');
+                if (document.body.classList.contains('fullscreen')) {
+                    icon.className = 'fas fa-compress';
+                } else {
+                    icon.className = 'fas fa-expand';
+                }
+            });
+        }
+
+        // Simulate chart (in a real app, use Chart.js or similar)
+        const departmentsChart = document.getElementById('departmentsChart');
+        if (departmentsChart) {
+            const ctx = departmentsChart.getContext('2d');
+            // Simple line drawing
+            ctx.beginPath();
+            ctx.moveTo(0, 20);
+            ctx.lineTo(20, 10);
+            ctx.lineTo(40, 25);
+            ctx.lineTo(60, 15);
+            ctx.lineTo(80, 30);
+            ctx.lineTo(100, 20);
+            ctx.strokeStyle = '#48bb78';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        // Highlight active action card
+        const actionCards = document.querySelectorAll('.action-card');
+        actionCards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                if (this.getAttribute('href') === '#') {
+                    e.preventDefault();
+                    actionCards.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                }
+            });
+        });
+    });
+
+    // Add CSS for rotating animation
+    const style = document.createElement('style');
+    style.textContent = `
+        .rotating {
+            animation: rotate 0.5s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .fullscreen {
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 20px !important;
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}
