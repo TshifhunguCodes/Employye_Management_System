@@ -89,7 +89,7 @@
                         <i class="fas fa-money-bill-wave"></i> Salary
                     </div>
                     <div class="info-value salary-value">
-                        ${{ "%.2f"|format(user.salary) if user.salary else '0.00' }}
+                      ${{ "%.2f"|format(parse_money(user.salary)) if user.salary else '0.00' }}
                     </div>
                 </div>
                 <div class="info-item">

@@ -4,6 +4,7 @@ import os
 import psycopg2
 import psycopg2.extras
 from functools import wraps
+import bcrypt
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key-here-change-this-in-production'
@@ -114,6 +115,25 @@ def get_table_columns(table_name):
         return TABLE_STRUCTURE[table_name]['columns']
     return []
 
+# Password Hashing Functions (ADDED BCrypt)
+def hash_password(password):
+    """Hash a password using bcrypt"""
+    if not password:
+        return None
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hashed.decode('utf-8')
+
+def check_password(hashed_password, user_password):
+    """Check if the provided password matches the hashed password"""
+    if not hashed_password or not user_password:
+        return False
+    try:
+        return bcrypt.checkpw(user_password.encode('utf-8'), hashed_password.encode('utf-8'))
+    except Exception as e:
+        print(f"Password check error: {e}")
+        return False
+
 # Authentication Decorator
 def login_required(f):
     @wraps(f)
@@ -202,26 +222,48 @@ def login():
         email = request.form['email']
         password = request.form['password']
         
-        # Check for admin login
-        if email == 'admin@example.com' and password == 'admin123':
-            session['user_id'] = 0
-            session['email'] = email
-            session['name'] = 'Administrator'
-            return redirect(url_for('admin_dashboard'))
-        
-        # Regular user login
+        # Query for the user
         query = """
         SELECT employee_id, firstname, lastname, email, passwords 
         FROM dimemployee 
-        WHERE email = %s AND passwords = %s
+        WHERE email = %s
         """
-        user = execute_query(query, (email, password), fetch_one=True)
+        user = execute_query(query, (email,), fetch_one=True)
         
         if user:
-            session['user_id'] = user['employee_id']
-            session['email'] = user['email']
-            session['name'] = f"{user['firstname']} {user['lastname']}"
-            return redirect(url_for('user_dashboard'))
+            stored_password = user['passwords']
+            
+            # Check password with transition support
+            password_correct = False
+            
+            # Method 1: Check if it's a bcrypt hash
+            if stored_password.startswith('$2b$'):
+                password_correct = bcrypt.checkpw(
+                    password.encode('utf-8'), 
+                    stored_password.encode('utf-8')
+                )
+            # Method 2: Check as plain text (for old passwords)
+            else:
+                password_correct = (stored_password == password)
+                # Auto-upgrade to bcrypt if correct
+                if password_correct:
+                    new_hash = hash_password(password)
+                    update_query = "UPDATE dimemployee SET passwords = %s WHERE employee_id = %s"
+                    execute_query(update_query, (new_hash, user['employee_id']))
+            
+            if password_correct:
+                session['user_id'] = user['employee_id']
+                session['email'] = user['email']
+                session['name'] = f"{user['firstname']} {user['lastname']}"
+                
+                if email == 'admin@example.com':
+                    session['user_id'] = 0
+                    session['name'] = 'Administrator'
+                    return redirect(url_for('admin_dashboard'))
+                else:
+                    return redirect(url_for('user_dashboard'))
+            else:
+                flash('Invalid credentials')
         else:
             flash('Invalid credentials')
     
@@ -250,7 +292,10 @@ def register():
         next_id = execute_query(id_query, fetch_one=True)
         employee_id = next_id[0] if next_id else 1
         
-        # Insert new employee
+        # Hash the password before storing (ADDED PASSWORD HASHING)
+        hashed_password = hash_password(password)
+        
+        # Insert new employee (UPDATED with hashed password)
         insert_query = """
         INSERT INTO dimemployee (employee_id, firstname, lastname, gender, email, 
                                 birthdate, hire, salary, passwords)
@@ -260,7 +305,7 @@ def register():
         try:
             execute_query(insert_query, (
                 employee_id, firstname, lastname, gender, email,
-                birthdate, datetime.now().date(), 0, password
+                birthdate, datetime.now().date(), 0, hashed_password
             ))
             flash('Registration successful! Please login.')
             return redirect(url_for('login'))
@@ -309,13 +354,13 @@ def user_dashboard():
     
     # Get current year for calculations
     now = datetime.now()
-    
     return render_template('user_dashboard.html', 
-                         user=user, 
-                         user_salary=user_salary,  # Pass parsed salary
-                         total_employees=total_employees,
-                         avg_salary=avg_salary,
-                         now=now)
+                     user=user, 
+                     user_salary=user_salary,  # Pass parsed salary
+                     total_employees=total_employees,
+                     avg_salary=avg_salary,
+                     now=now,
+                     parse_money=parse_money)  # ADD THIS LINE
 
 @app.route('/admin')
 @admin_required
@@ -351,14 +396,89 @@ def admin_tables(table_name):
     # Get column names from our structure
     columns = TABLE_STRUCTURE[table_name]['columns']
     
+    # Get the primary key for the table
+    primary_key = TABLE_STRUCTURE[table_name]['pk']
+    
+    # Initialize stats variables with default values
+    active_employees = 0
+    department_count = 0
+    avg_salary = 0.0
+    total_employees = 0
+    total_budget = 0.0
+    total_jobs = 0
+    avg_min_salary = 0.0
+    avg_max_salary = 0.0
+    total_locations = 0
+    country_count = 0
+    
+    # Calculate table-specific statistics
+    if table_name == 'dimemployee':
+        # Get active employees count (assuming all are active in this simple implementation)
+        active_employees = total_records
+        
+        # Get department count
+        dept_count = execute_query("SELECT COUNT(*) FROM dimdepartment", fetch_one=True)
+        department_count = dept_count[0] if dept_count else 0
+        
+        # Get average salary (excluding 0)
+        avg_query = """
+        SELECT AVG(CAST(REPLACE(REPLACE(salary::text, '$', ''), ',', '') AS NUMERIC)) 
+        FROM dimemployee 
+        WHERE CAST(REPLACE(REPLACE(salary::text, '$', ''), ',', '') AS NUMERIC) > 0
+        """
+        avg_result = execute_query(avg_query, fetch_one=True)
+        if avg_result and avg_result[0]:
+            try:
+                avg_salary = float(avg_result[0])
+            except (ValueError, TypeError):
+                avg_salary = 0.0
+    
+    elif table_name == 'dimdepartment':
+        # Get total employees count
+        emp_count = execute_query("SELECT COUNT(*) FROM dimemployee", fetch_one=True)
+        total_employees = emp_count[0] if emp_count else 0
+        
+        # Set default total budget (you might want to calculate this from your data)
+        total_budget = 0.0
+    
+    elif table_name == 'dimjob':
+        # Get total jobs
+        total_jobs = total_records
+        
+        # Set default salary ranges (you might want to calculate these from your data)
+        avg_min_salary = 40000.0
+        avg_max_salary = 80000.0
+    
+    elif table_name == 'dimlocation':
+        # Get total locations
+        total_locations = total_records
+        
+        # Get unique countries/provinces count
+        loc_count = execute_query("SELECT COUNT(DISTINCT province) FROM dimlocation", fetch_one=True)
+        country_count = loc_count[0] if loc_count else 0
+    
+    # Pass the records as 'records' to match the template variable
     return render_template('admin_tables.html',
                          table_name=table_name,
-                         data=data,
+                         records=data,  # Changed from 'data' to 'records' to match template
                          columns=columns,
                          page=page,
                          total_pages=total_pages,
                          total_records=total_records,
-                         parse_money=parse_money)  # Pass helper function
+                         parse_money=parse_money,
+                         primary_key=primary_key,  # Add primary key
+                         
+                         # Statistics variables
+                         active_employees=active_employees,
+                         department_count=department_count,
+                         avg_salary=avg_salary,
+                         total_employees=total_employees,
+                         total_budget=total_budget,
+                         total_jobs=total_jobs,
+                         avg_min_salary=avg_min_salary,
+                         avg_max_salary=avg_max_salary,
+                         total_locations=total_locations,
+                         country_count=country_count)
 
 @app.route('/admin/edit/<table_name>/<int:id>', methods=['GET', 'POST'])
 @admin_required
@@ -384,9 +504,15 @@ def admin_edit(table_name, id):
         values = []
         
         for column in columns:
-            if column in request.form and column != pk_column and column != 'passwords':
-                set_clauses.append(f"{column} = %s")
-                values.append(request.form[column])
+            if column in request.form and column != pk_column:
+                if column == 'passwords' and request.form[column]:
+                    # Hash the new password (ADDED PASSWORD HASHING)
+                    hashed_password = hash_password(request.form[column])
+                    set_clauses.append(f"{column} = %s")
+                    values.append(hashed_password)
+                elif column != 'passwords':  # Don't update password if empty
+                    set_clauses.append(f"{column} = %s")
+                    values.append(request.form[column])
         
         if set_clauses:
             # Add the ID value at the end
@@ -450,9 +576,16 @@ def admin_add(table_name):
         
         for column in columns:
             if column in request.form and request.form[column]:
-                insert_columns.append(column)
-                placeholders.append('%s')
-                values.append(request.form[column])
+                if column == 'passwords':
+                    # Hash the password before storing (ADDED PASSWORD HASHING)
+                    hashed_password = hash_password(request.form[column])
+                    insert_columns.append(column)
+                    placeholders.append('%s')
+                    values.append(hashed_password)
+                else:
+                    insert_columns.append(column)
+                    placeholders.append('%s')
+                    values.append(request.form[column])
             elif column == 'hire' and table_name == 'dimemployee':
                 insert_columns.append(column)
                 placeholders.append('%s')
@@ -594,15 +727,17 @@ def init_db():
         )
         """)
         
-        # Add admin user if not exists
+        # Add admin user if not exists (UPDATED with hashed password)
         cursor.execute("SELECT COUNT(*) FROM dimemployee WHERE email = 'admin@example.com'")
         admin_count = cursor.fetchone()[0]
         
         if admin_count == 0:
+            # Hash the admin password
+            admin_hashed_password = hash_password('admin123')
             cursor.execute("""
             INSERT INTO dimemployee (employee_id, firstname, lastname, email, passwords, gender, hire, salary)
-            VALUES (9999, 'Admin', 'User', 'admin@example.com', 'admin123', 'Other', CURRENT_DATE, 0)
-            """)
+            VALUES (9999, 'Admin', 'User', 'admin@example.com', %s, 'Other', CURRENT_DATE, 0)
+            """, (admin_hashed_password,))
         
         conn.commit()
         cursor.close()
@@ -618,7 +753,7 @@ def init_db():
             <li>dimjob (with columns: jobid, jobtitle, hiredate)</li>
             <li>dimlocation (with columns: locationid, city, state, province)</li>
         </ul>
-        <p><strong>Admin user created:</strong> admin@example.com / admin123</p>
+        <p><strong>Admin user created:</strong> admin@example.com / admin123 (password is now securely hashed)</p>
         <p><a href="/">Go to Login</a></p>
         """
     except Exception as e:
@@ -626,6 +761,22 @@ def init_db():
             conn.rollback()
             conn.close()
         return f"Error initializing database: {str(e)}"
+
+# Add a custom Jinja2 filter for currency formatting
+@app.template_filter('format_currency')
+def format_currency_filter(value):
+    """Format a value as currency"""
+    try:
+        # Parse the money value if it's a string
+        if isinstance(value, str):
+            num_value = parse_money(value)
+        else:
+            num_value = float(value)
+        
+        # Format with 2 decimal places and commas
+        return f"{num_value:,.2f}"
+    except (ValueError, TypeError):
+        return "0.00"
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

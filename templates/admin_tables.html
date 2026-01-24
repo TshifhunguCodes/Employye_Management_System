@@ -116,14 +116,12 @@
                                 {% set value = record[column] %}
                                 {% if value is none %}
                                     <span class="empty-value">—</span>
-                                {% elif column.endswith('date') or column.endswith('_at') %}
-                                    {% if value %}
-                                        <span class="date-value" title="{{ value }}">
-                                            {{ value.strftime('%Y-%m-%d') if value is string else value }}
-                                        </span>
-                                    {% else %}
-                                        <span class="empty-value">—</span>
-                                    {% endif %}
+                              {% elif column.endswith('salary') or column.endswith('price') or column.endswith('budget') %}
+      {% if value %}
+       <span class="currency-value">${{ "%.2f"|format(parse_money(value)) }}</span>
+    {% else %}
+        <span class="empty-value">—</span>
+    {% endif %}
                                 {% elif column.endswith('salary') or column.endswith('price') or column.endswith('budget') %}
                                     {% if value %}
                                         <span class="currency-value">${{ "%.2f"|format(value) }}</span>
@@ -292,7 +290,7 @@
                 <i class="fas fa-chart-pie"></i>
             </div>
             <div class="stat-content">
-                <h3>${{ "%.2f"|format(total_budget) }}</h3>
+               <h3>${{ "%.2f"|format(total_budget|default(0)) }}</h3>
                 <p>Total Budget</p>
             </div>
         </div>
