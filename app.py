@@ -222,7 +222,15 @@ def login():
         email = request.form['email']
         password = request.form['password']
         
-        # Query for the user
+        # ===== HARDCODED ADMIN CHECK =====
+        if email == 'admin@company.com' and password == 'admin123':
+            session['user_id'] = 0
+            session['email'] = 'admin@example.com'
+            session['name'] = 'Administrator'
+            return redirect(url_for('admin_dashboard'))
+        # ===== END ADMIN CHECK =====
+        
+        # Regular user login (from database)
         query = """
         SELECT employee_id, firstname, lastname, email, passwords 
         FROM dimemployee 
@@ -255,13 +263,7 @@ def login():
                 session['user_id'] = user['employee_id']
                 session['email'] = user['email']
                 session['name'] = f"{user['firstname']} {user['lastname']}"
-                
-                if email == 'admin@example.com':
-                    session['user_id'] = 0
-                    session['name'] = 'Administrator'
-                    return redirect(url_for('admin_dashboard'))
-                else:
-                    return redirect(url_for('user_dashboard'))
+                return redirect(url_for('user_dashboard'))
             else:
                 flash('Invalid credentials')
         else:

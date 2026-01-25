@@ -1,0 +1,95 @@
+-- ============================================
+-- 1. DEPARTMENTS (dimdepartment)
+-- ============================================
+-- departmentid is SERIAL, so don't include it
+INSERT INTO dimdepartment (departmentname, departmentrole) VALUES
+('Human Resources', 'Employee Relations & Recruitment'),
+('Information Technology', 'Software Development & Support'),
+('Finance', 'Accounting & Budget Management'),
+('Marketing', 'Digital Marketing & Brand Management'),
+('Sales', 'Client Acquisition & Revenue Generation'),
+('Operations', 'Business Process Management'),
+('Research & Development', 'Product Innovation & Testing'),
+('Customer Service', 'Client Support & Satisfaction'),
+('Legal', 'Compliance & Contract Management'),
+('Administration', 'Office Management & Support');
+
+-- ============================================
+-- 2. JOB POSITIONS (dimjob)
+-- ============================================
+-- jobid is SERIAL
+INSERT INTO dimjob (jobtitle, hiredate) VALUES
+('Senior Software Engineer', '2023-01-15'),
+('HR Manager', '2022-03-10'),
+('Financial Analyst', '2023-05-20'),
+('Marketing Director', '2022-11-05'),
+('Sales Executive', '2021-08-12'),
+('Data Scientist', '2023-07-30'),
+('Customer Support Specialist', '2023-03-25'),
+('Operations Manager', '2022-09-18'),
+('Legal Counsel', '2021-12-01'),
+('Administrative Coordinator', '2023-02-14'),
+('DevOps Engineer', '2023-04-10'),
+('UX Designer', '2022-07-22'),
+('Product Manager', '2021-11-30'),
+('Business Analyst', '2023-06-05'),
+('Recruitment Specialist', '2022-12-15');
+
+-- ============================================
+-- 3. LOCATIONS (dimlocation)
+-- ============================================
+-- locationid is SERIAL
+INSERT INTO dimlocation (city, state, province) VALUES
+('New York', 'NY', 'Northeast Region'),
+('Los Angeles', 'CA', 'West Coast'),
+('Chicago', 'IL', 'Midwest'),
+('Houston', 'TX', 'South Central'),
+('Miami', 'FL', 'Southeast'),
+('Seattle', 'WA', 'Pacific Northwest'),
+('Boston', 'MA', 'New England'),
+('Atlanta', 'GA', 'Southeast'),
+('Denver', 'CO', 'Mountain Region'),
+('San Francisco', 'CA', 'West Coast'),
+('Austin', 'TX', 'South Central'),
+('Phoenix', 'AZ', 'Southwest'),
+('Philadelphia', 'PA', 'Northeast Region'),
+('Dallas', 'TX', 'South Central'),
+('Portland', 'OR', 'Pacific Northwest');
+
+-- ============================================
+-- 4. EMPLOYEES (dimemployee) WITH PASSWORDS
+-- ============================================
+-- employee_id is SERIAL
+-- All passwords are hashed version of 'password123'
+-- bcrypt hash of 'password123': $2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW
+INSERT INTO dimemployee (firstname, lastname, gender, email, birthdate, hire, salary, passwords) VALUES
+('James', 'Wilson', 'male', 'james.wilson@company.com', '1985-03-14', '2020-05-10', 85000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Sarah', 'Johnson', 'female', 'sarah.johnson@company.com', '1990-07-22', '2021-02-15', 72000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Michael', 'Chen', 'male', 'michael.chen@company.com', '1988-11-30', '2019-08-20', 95000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Emily', 'Rodriguez', 'female', 'emily.rodriguez@company.com', '1993-04-18', '2022-03-05', 68000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('David', 'Kim', 'male', 'david.kim@company.com', '1991-09-12', '2020-11-30', 78000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Jessica', 'Martinez', 'female', 'jessica.martinez@company.com', '1987-06-25', '2018-07-15', 92000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Robert', 'Williams', 'male', 'robert.williams@company.com', '1984-01-08', '2017-04-22', 105000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Amanda', 'Brown', 'female', 'amanda.brown@company.com', '1992-12-03', '2021-09-18', 65000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Daniel', 'Garcia', 'male', 'daniel.garcia@company.com', '1989-05-19', '2020-01-25', 88000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Olivia', 'Davis', 'female', 'olivia.davis@company.com', '1994-08-07', '2023-02-14', 62000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Christopher', 'Miller', 'male', 'chris.miller@company.com', '1986-02-28', '2019-06-10', 97000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Sophia', 'Taylor', 'female', 'sophia.taylor@company.com', '1991-10-15', '2022-07-30', 71000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Matthew', 'Anderson', 'male', 'matt.anderson@company.com', '1983-07-04', '2016-03-12', 112000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Isabella', 'Thomas', 'female', 'isabella.thomas@company.com', '1995-03-21', '2023-04-05', 59000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Andrew', 'Moore', 'male', 'andrew.moore@company.com', '1990-11-11', '2021-05-20', 83000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Mia', 'Jackson', 'female', 'mia.jackson@company.com', '1993-06-09', '2022-08-15', 69000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Joshua', 'White', 'male', 'josh.white@company.com', '1988-04-17', '2019-09-22', 91000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Charlotte', 'Harris', 'female', 'charlotte.harris@company.com', '1992-01-23', '2021-11-08', 75000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Kevin', 'Martin', 'male', 'kevin.martin@company.com', '1987-08-30', '2020-07-14', 86000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Ava', 'Thompson', 'female', 'ava.thompson@company.com', '1994-05-16', '2023-01-30', 64000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Brian', 'Lee', 'male', 'brian.lee@company.com', '1985-12-07', '2018-12-03', 99000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Harper', 'Clark', 'female', 'harper.clark@company.com', '1991-09-28', '2022-05-19', 73000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Jason', 'Lewis', 'male', 'jason.lewis@company.com', '1989-02-14', '2020-03-27', 89000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Evelyn', 'Walker', 'female', 'evelyn.walker@company.com', '1993-07-11', '2023-03-10', 61000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Ryan', 'Hall', 'male', 'ryan.hall@company.com', '1990-04-05', '2021-08-25', 82000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Abigail', 'Allen', 'female', 'abigail.allen@company.com', '1995-10-22', '2023-06-15', 58000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Nicholas', 'Young', 'male', 'nick.young@company.com', '1986-06-18', '2019-04-08', 94000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Ella', 'King', 'female', 'ella.king@company.com', '1992-03-02', '2022-01-12', 70000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Eric', 'Wright', 'male', 'eric.wright@company.com', '1988-11-19', '2020-09-05', 87000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW'),
+('Grace', 'Scott', 'female', 'grace.scott@company.com', '1994-08-08', '2023-05-20', 63000, '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW');
