@@ -10,6 +10,14 @@ A full-stack **Employee Management System** built with **Flask** (Python) and **
 
 ---
 
+## 🎥 Live Demo
+
+[![Employee Management System Demo](https://img.youtube.com/vi/L-6g4ur9ohM/0.jpg)](https://www.youtube.com/watch?v=L-6g4ur9ohM)
+
+Watch the full walkthrough of the Employee Management System on YouTube — including employee login, registration, admin dashboard navigation, CRUD operations on all tables, and system statistics.
+
+---
+
 ## 📋 Overview
 
 This system provides a complete employee data management platform with:
